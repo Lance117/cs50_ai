@@ -47,8 +47,9 @@ def result(board, action):
     Returns the board that results from making move (i, j) on the board.
     """
     i, j = action
-    board[i][j] = player(board)
-    return board
+    next_board = [row[:] for row in board]
+    next_board[i][j] = player(board)
+    return next_board
 
 def winner(board):
     """
@@ -65,9 +66,8 @@ def winner(board):
         [board[0][2], board[1][2], board[2][2]],
     ]
     for line in lines:
-        a, b, c = line
-        if a == b and b == c:
-            return a
+        if all([e == line[0] for e in line]):
+            return line[0]
     return None
 
 def draw(board):
@@ -90,8 +90,25 @@ def utility(board):
         return -1
     return 0
 
+def max_player(board):
+    if terminal(board):
+        return utility(board)
+    v = float('-inf')
+    for action in actions(board):
+        v = max(v, min_player(result(board, action)))
+    return v
+
+def min_player(board):
+    if terminal(board):
+        return utility(board)
+    v = float('inf')
+    for action in actions(board):
+        v = min(v, max_player(result(board, action)))
+    return v
+
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    for action in actions(board):
+        return action
