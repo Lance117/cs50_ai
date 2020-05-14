@@ -82,7 +82,7 @@ def utility(board):
     win = winner(board)
     if win == X:
         return 1
-    elif win == 0:
+    elif win == O:
         return -1
     return 0
 
