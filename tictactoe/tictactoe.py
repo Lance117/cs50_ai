@@ -34,19 +34,15 @@ def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    res = set()
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if not board[i][j]:
-                res.add((i, j))
-    return res
-
+    return set([(i, j) for j in range(3) for i in range(3) if not board[i][j]])
 
 def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
     i, j = action
+    if not (0 <= i < 3 and 0 <= j < 3):
+        raise ValueError('action out of bounds')
     next_board = [row[:] for row in board]
     next_board[i][j] = player(board)
     return next_board
@@ -92,23 +88,26 @@ def utility(board):
 
 def max_player(board):
     if terminal(board):
-        return utility(board)
-    v = float('-inf')
+        return (utility(board), None)
+    v = (float('-inf'), None)
     for action in actions(board):
-        v = max(v, min_player(result(board, action)))
+        min_val = min_player(result(board, action))
+        if min_val[0] > v[0]:
+            v = (min_val[0], action)
     return v
 
 def min_player(board):
     if terminal(board):
-        return utility(board)
-    v = float('inf')
+        return (utility(board), None)
+    v = (float('inf'), None)
     for action in actions(board):
-        v = min(v, max_player(result(board, action)))
+        max_val = max_player(result(board, action))
+        if max_val[0] < v[0]:
+            v = (max_val[0], action)
     return v
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    for action in actions(board):
-        return action
+    return max_player(board)[1] if player(board) == X else min_player(board)[1]
