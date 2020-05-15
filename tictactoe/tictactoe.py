@@ -86,24 +86,28 @@ def utility(board):
         return -1
     return 0
 
-def max_player(board):
+def max_player(board, alpha=float('-inf'), beta=float('inf')):
     if terminal(board):
         return (utility(board), None)
-    v = (float('-inf'), None)
+    v = (alpha, None)
     for action in actions(board):
-        min_val = min_player(result(board, action))
+        min_val = min_player(result(board, action), v[0], beta)
         if min_val[0] > v[0]:
             v = (min_val[0], action)
+            if v[0] >= beta:
+                break
     return v
 
-def min_player(board):
+def min_player(board, alpha=float('-inf'), beta=float('inf')):
     if terminal(board):
         return (utility(board), None)
-    v = (float('inf'), None)
+    v = (beta, None)
     for action in actions(board):
-        max_val = max_player(result(board, action))
+        max_val = max_player(result(board, action), alpha, v[0])
         if max_val[0] < v[0]:
             v = (max_val[0], action)
+            if alpha >= v[0]:
+                break
     return v
 
 def minimax(board):
